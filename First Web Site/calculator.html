@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <link rel="stylesheet" type="text/css" href="calcstyle.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="calculator">
+	<div id="calculator_display"></div>
+
+	<div class="calculator_keys">
+		<!--Operator Keys-->
+        <button onclick = "operatorPlus()" class="operator" id="plus">+</button>
+    	<button onclick = "operatorMinus()" class="operator" id="minus">-</button>
+    	<button onclick = "operatorTimes()" class="operator" id="multiply">&times;</button>
+    	<button onclick = "operatorDivide()" class="operator" id="divide">÷</button>
+        <button onclick = "numSeven()" class="digit" id="seven">7</button>
+    	<button onclick = "numEight()" class="digit" id="eight">8</button>
+    	<button onclick = "numNine()" class="digit" id="nine">9</button>
+        <button onclick = "numFour()" class="digit" id="four">4</button>
+    	<button onclick = "numFive()" class="digit" id="five">5</button>
+    	<button onclick = "numSix()" class="digit" id="six">6</button>
+    	<button onclick = "numOne()" class="digit" id="one">1</button>
+    	<button onclick = "numTwo()" class="digit" id="two">2</button>
+    	<button onclick = "numThree()" class="digit" id="three">3</button>
+    	<button onclick = "numZero()" class="digit" id="zero">0</button>
+    	<!--Decimal Point-->
+        <button onclick = "decimalPoint()" class="decimal" id="decimal">.</button>
+    	<!--Special Keys-->
+        <button onclick = "clearAll()" class="clear" id="clear">AC</button>
+    	<button onclick = "solve()" class="equal" id="equal">=</button>
+        <button onclick = "deleteLast()" class="delete" id="del"><img src="assets\del.png"></button>
+	</div>
+</div>
+
+<script type="text/javascript" src="calcscript.js"></script>
+
+</body>
+</html>

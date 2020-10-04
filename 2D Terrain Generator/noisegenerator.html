@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        header {
+            font-size: larger;
+            font-weight: bold;
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            margin-bottom: 10px;
+        }
+        main {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .container {
+            height: 600px;
+            width: 600px;
+            display: flex;
+            flex-wrap: wrap;
+            flex-flow: row;
+            background-color: lime;
+        }
+        .modifiers {
+            font-family: 'Courier New', Courier, monospace;
+            padding: 25px;
+            border: 1px solid black;
+            border-radius: 10px;
+            
+        }
+        .bar {
+            height: 600px;
+            width: 20px;
+            background-color: aqua;
+        }
+        button {
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        TERRAIN GENERATOR
+    </header>
+    <main>
+    <div class="container" id="container">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+    </div>
+    <div class="modifiers">
+        <p>Modifiers</p>
+        <label for="min">Min </label><textarea id="min" name="min" cols="4" rows="1">50</textarea><br>
+        <label for="max">Max </label><textarea id="max" name="max" cols="4" rows="1">70</textarea><br>
+        <label for="coefficient">&nbsp;∆h </label><textarea id="coefficient" name="coefficient" cols="4" rows="1">1</textarea><br>
+        <button onclick="main()">Generate</button>
+    </div>
+    </main>
+    <script>
+        const main = () => {
+            const barchart = document.querySelectorAll('.bar');
+            const container = document.getElementById('container')
+
+            function smallestScreenDimension() { // scale to fit screen
+                return screen.width < screen.height ? screen.width - 15 : screen.height * 0.8
+            }
+        
+            // Generate 30 random numbers between 0 and 100. The difference in relative value between one and another must be no
+            // more than a certain index
+
+            function randomPercentage() {
+                return(Math.floor(Math.random()*100));
+            }
+            function checkBounds (num,min,max) {
+                if (num>max||num<min) return true
+                else return false
+            }
+            function checkDistance (num,num2,q) {
+                if (Math.abs(num-num2)>q) return true
+                else return false
+            }
+
+            function createNoise(array) { // the function argument is used exclusively to know how many values we need
+                let min = 50;
+                let max = 70;
+                let coefficient = 1; // Maximum allowed distance between one point and the next
+                /* Make room for user input, overwrite the above.*/
+                min = document.getElementById('min').value
+                max = document.getElementById('max').value
+                coefficient = document.getElementById('coefficient').value
+                
+                let values = [] // instantiate array
+
+                values[0] = randomPercentage() // create first value
+
+                while (checkBounds(values[0],min,max)) { // funnel value into range
+                    values[0] = randomPercentage()
+                }
+
+                console.log('found an appropriate starting value: ' + values[0]) // debug
+
+                for (let i=1; i<array.length; i++) { // populate array based on first value
+                    values[i] = randomPercentage()
+                    while (checkDistance(values[i],values[i-1],coefficient)) {
+                        values[i] = randomPercentage()
+                    }
+                }
+
+                console.log(values) // debug
+
+                // draw bars, scale to fit window
+                let dimension = smallestScreenDimension()
+                let maxDimension = 400
+                dimension > maxDimension ? dimension = maxDimension : dimension
+                for (let i=0; i<barchart.length; i++) {
+                    barchart[i].style.height = `${values[i]}%`
+                    barchart[i].style.width = `${dimension/30}px`
+                }
+                container.style.width = dimension + 'px'
+                container.style.height = dimension + 'px'
+            }
+
+            createNoise(barchart) // function call
+        }
+        main();
+    </script>
+</body>
+</html>

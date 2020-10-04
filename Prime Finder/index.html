@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Playing with Primes</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;}
+		input{width: 60px;}
+		.output{border-style:solid;border-width:2px;width:clamp(50vh ,95vw, 130vh);height:clamp(40vh, 56vw, 70vh);margin-top:2%;overflow-y:scroll;word-wrap:break-word;}
+	</style>
+</head>
+<body>
+	<h1>Prime Number Generator</h1>
+	<p>Find all primes in a certain range.</p>
+	<button id='gen'>Generate</button>
+	from <input type="text" id="min" value="0"> to <input type="text" id="max" value="1e7">
+	<div class="output"></div>
+	<script>
+		let output = document.querySelector('.output');
+		const isPrime = num => {
+    		for(let i = 2, s = Math.sqrt(num); i <= s; i++)
+        	if(num % i === 0) return false; 
+    		return num > 1;
+		}
+		const generatePrimes = () => {
+			let primeArray = [];
+			let range = [document.querySelector('#min').value,document.querySelector('#max').value];			
+			for (let i = range[0]; i <= range[1]; i++){
+				if(isPrime(i))primeArray.push(i);
+			}
+			output.innerHTML = primeArray.join(' ');
+		}
+		document.getElementById('gen').addEventListener('click', generatePrimes)
+	</script>
+</body>
+</html>

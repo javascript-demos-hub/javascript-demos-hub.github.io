@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta name = "viewport" content = "width=device-width">
+    <title>Canvas</title>
+    <style>
+      * { box-sizing:border-box; margin:0; padding:0; }
+      html { height:100%; width:100%; }
+      body { text-align:center;max-height:100%;width:100%;font-size:1.25em;color:#ffffff;background-color:#202830;margin-top:10vh;}
+      button { width:fit-content;height:fit-content;margin-left:-214px;margin-top:15px;}
+      canvas { margin-top:10vh; }
+      .debug { display:block;width:fit-content;text-align:left;margin:15px auto;font-size:0.9em;}
+    </style>
+  </head>
+
+  <body>
+    <p class="info">Interactive Canvas. Arrow keys to move</p>
+    <canvas></canvas>
+    <br>
+    <button>Show Debug Info</button>
+    <div class="debug" style="display:none">
+      <p>x_velocity: <span id='xvel'></span></p>
+      <p>y_velocity: <span id='yvel'></span></p>
+      <p>jumping: <span id='jumping'></span></p>
+    </div>
+    <script type = "text/javascript">
+    //START SCRIPT//
+      let ctx = document.querySelector("canvas").getContext("2d");
+      ctx.canvas.height = 180;
+      ctx.canvas.width = 320;
+
+      //define equilateral triangle
+      let triangle = {
+        width:30,
+        height:(30*Math.sqrt(3))/2,
+        jumping:true,
+        x:0,
+        y:100,
+        x_velocity:0,
+        y_velocity:0,
+      }
+      
+      let floorTile = {
+        x:0,
+        y:150,
+      }
+
+      //define controller
+      let controller = {
+        left:false,
+        right:false,
+        up:false,
+        keyListener: (event) => {
+          let key_state = (event.type == "keydown") ? true : false;
+          switch(event.keyCode) {
+            case 37:
+              controller.left = key_state;
+              break;
+            case 38:
+              controller.up = key_state;
+              break;
+            case 39:
+              controller.right = key_state;
+          }
+        }
+      }
+
+      let loop = () => {
+        //ADD GRAVITY
+        if (triangle.y < floorTile.y && triangle.jumping){
+          triangle.y_velocity+=0.5;
+          triangle.y += triangle.y_velocity;
+          if (triangle.y > floorTile.y){
+            triangle.y = floorTile.y;
+            triangle.jumping = false;
+          }
+        }
+
+        //INTERACTIVITY
+        if (controller.up && triangle.jumping == false) {
+          triangle.y_velocity -= 16;
+          triangle.jumping = true;
+        }
+        if (controller.left) {
+          triangle.x_velocity -= 1;
+        }
+        if (controller.right) {
+          triangle.x_velocity += 1;
+        }
+        
+        //MOVE TRIANGLE BASED ON VELOCITIES, ADD GRAVITY AND FRICTION
+        triangle.y_velocity += 1.5;//gravity
+        triangle.x += triangle.x_velocity;
+        triangle.y += triangle.y_velocity;
+        triangle.x_velocity *= 0.8;//friction
+        // triangle.y_velocity *= 0.6;//friction
+        
+        //if triangle is falling below floor line
+        if (triangle.y > floorTile.y) {
+          triangle.jumping = false;
+          triangle.y = floorTile.y;
+          triangle.y_velocity = 0;
+        }
+        //if triangle is going off the left of the screen
+        if (triangle.x < -triangle.width) {
+          triangle.x = ctx.canvas.width;
+        } else if (triangle.x > ctx.canvas.width) {
+          triangle.x = -triangle.width;
+        }
+        //define center of triangle
+        let center = {
+          x:triangle.x + triangle.width*0.5,
+          y:triangle.y - triangle.height*0.5,
+        }
+        
+        //defining gradients
+        let skyGrd = ctx.createLinearGradient(0, 0, 0, 300);
+        skyGrd.addColorStop(0, "#FF00C0");
+        skyGrd.addColorStop(1, '#4900FF');
+        let flrGrd = ctx.createLinearGradient(0, ctx.canvas.height*0.7, 0, ctx.canvas.height);
+        flrGrd.addColorStop(1,"#4900FF");
+        flrGrd.addColorStop(0, 'black');
+        let triGrd = ctx.createRadialGradient(triangle.x + (triangle.width * 0.5), triangle.y - (triangle.height * 0.5), 2, center.x, center.y + 3, 12);
+          triGrd.addColorStop(0, "#00FFF9");
+          triGrd.addColorStop(1, "#00B8FF");
+        //DRAW BACKDROP
+        //draw sky
+        ctx.fillStyle = skyGrd;
+        ctx.fillRect(0, 0, ctx.canvas.width, 150);
+        //draw floor
+        ctx.fillStyle = flrGrd;
+        ctx.fillRect(floorTile.x, floorTile.y, ctx.canvas.width, ctx.canvas.height)
+        //DRAW TRIANGLE
+        ctx.fillStyle = triGrd;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(triangle.x, triangle.y);
+        ctx.lineTo(triangle.x+triangle.width, triangle.y);
+        ctx.lineTo(triangle.x+(triangle.width*0.5), triangle.y-triangle.height);
+        ctx.closePath();
+        ctx.fill();
+        //DRAW HITBOX
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(triangle.x, triangle.y);
+        ctx.lineTo(triangle.x + triangle.width, triangle.y);
+        ctx.lineTo(triangle.x + triangle.width, triangle.y - triangle.height);
+        ctx.lineTo(triangle.x, triangle.y - triangle.height);
+        ctx.closePath();
+        ctx.stroke();
+
+        document.getElementById('xvel').innerHTML = triangle.x_velocity.toFixed(2);
+        document.getElementById('yvel').innerHTML = triangle.y_velocity.toFixed(2);
+        document.getElementById('jumping').innerHTML = triangle.jumping;
+        
+        window.requestAnimationFrame(loop);        
+      };
+
+      //TOGGLE DEBUG
+      let button = document.querySelector('button');
+      let debugDiv = document.querySelector('.debug')
+      let toggleDebug = () => {
+			    let displayValue = "";
+			    if (debugDiv.style.display == "") {
+				    displayValue = "none";
+			    }
+			  debugDiv.style.display = displayValue;
+      }
+      
+      //HANDLE EVENTS
+      window.addEventListener('keydown', controller.keyListener);
+      window.addEventListener('keyup', controller.keyListener);
+      button.addEventListener('click', toggleDebug);
+      //loop
+      window.requestAnimationFrame(loop);
+    </script>
+
+  </body>
+
+</html>
